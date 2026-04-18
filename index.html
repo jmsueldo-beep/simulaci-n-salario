@@ -15,7 +15,6 @@
       --azul-borde: #aac4de;
       --celeste: #2980b9;
       --rojo: #c0392b;
-      --amarillo: #f0c040;
       --bg: #f4f4f2;
       --blanco: #ffffff;
       --gris-borde: #d0d0cc;
@@ -40,7 +39,7 @@
 
     .main { max-width: 960px; margin: 0 auto; padding: 28px 24px 60px; display: grid; grid-template-columns: 1fr 280px; gap: 24px; align-items: start; }
 
-    .ficha { background: var(--azul); color: #fff; padding: 20px 24px; margin-bottom: 20px; border-left: 6px solid var(--amarillo); }
+    .ficha { background: var(--azul); color: #fff; padding: 20px 24px; margin-bottom: 20px; border-left: 6px solid var(--celeste); }
     .ficha-titulo { font-family: var(--serif); font-size: 22px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
     .ficha-subtitulo { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.5; }
     .ficha-meta { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.2); display: flex; gap: 24px; font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; flex-wrap: wrap; }
@@ -52,6 +51,15 @@
     input[type=range] { flex: 1; -webkit-appearance: none; height: 6px; background: var(--azul-claro); border: 1px solid var(--azul-borde); border-radius: 0; outline: none; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--azul); border: 2px solid var(--blanco); box-shadow: 0 0 0 1px var(--azul); border-radius: 0; cursor: pointer; }
     .inf-badge { background: var(--azul); color: #fff; font-size: 18px; font-weight: 600; font-family: var(--serif); padding: 6px 14px; min-width: 64px; text-align: center; }
+
+    .salario-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--gris-claro); }
+    .salario-row label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gris-texto); white-space: nowrap; }
+    .salario-input-wrap { display: flex; align-items: center; border: 1px solid var(--azul-borde); background: var(--blanco); }
+    .salario-prefix { padding: 6px 10px; background: var(--azul-claro); color: var(--azul); font-family: var(--serif); font-weight: 600; font-size: 14px; border-right: 1px solid var(--azul-borde); }
+    input[type=number] { border: none; outline: none; padding: 6px 10px; font-family: var(--serif); font-size: 14px; font-weight: 600; color: var(--azul); width: 140px; background: var(--blanco); -moz-appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .salario-btn { background: var(--azul); color: #fff; border: none; padding: 6px 14px; font-size: 12px; font-family: var(--sans); font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; }
+    .salario-btn:hover { background: var(--azul-medio); }
 
     .grafico-box { background: var(--blanco); border: 1px solid var(--gris-borde); padding: 20px; margin-bottom: 20px; }
     .grafico-titulo { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--azul); border-bottom: 1px solid var(--gris-borde); padding-bottom: 10px; margin-bottom: 16px; }
@@ -78,7 +86,7 @@
     .dato-valor { font-family: var(--serif); font-weight: 700; color: var(--azul); white-space: nowrap; }
     .sidebar-nota { padding: 10px 14px; font-size: 11px; color: #888; border-top: 1px solid var(--gris-claro); line-height: 1.5; }
     .conclusion-box { background: var(--azul); color: #fff; padding: 18px; font-size: 13px; line-height: 1.7; }
-    .conclusion-box strong { display: block; font-family: var(--serif); font-size: 15px; margin-bottom: 8px; color: var(--amarillo); }
+    .conclusion-box strong { display: block; font-family: var(--serif); font-size: 15px; margin-bottom: 8px; color: rgba(255,255,255,0.9); }
 
     .footer { background: var(--azul); color: rgba(255,255,255,0.45); text-align: center; font-size: 11px; padding: 16px 24px; line-height: 1.6; }
 
@@ -99,11 +107,11 @@
       <ellipse cx="20" cy="20" rx="8" ry="12" fill="none" stroke="#75aadb" stroke-width="2"/>
       <line x1="20" y1="8" x2="20" y2="32" stroke="#75aadb" stroke-width="1.5"/>
       <line x1="12" y1="20" x2="28" y2="20" stroke="#75aadb" stroke-width="1.5"/>
-      <circle cx="20" cy="20" r="3" fill="#f0c040"/>
+      <circle cx="20" cy="20" r="3" fill="#aac4de"/>
     </svg>
     <div class="header-org">
-      <strong>Ministerio de Economía · Análisis Financiero</strong>
-      Informe de divulgación · Poder adquisitivo y salarios
+      <strong>Ministerio de Economía Ficticio · Análisis Financiero</strong>
+      Ejercicio teórico de divulgación · Poder adquisitivo y salarios
     </div>
   </div>
 </div>
@@ -111,7 +119,7 @@
 <div class="header-nav">
   <div class="header-nav-inner">
     <h1>Simulador de Depreciación Salarial</h1>
-    <span class="serie">Ejercicio educativo · Año base 2024</span>
+    <span class="serie">Ejercicio teórico · Elaboración propia</span>
   </div>
 </div>
 
@@ -123,7 +131,7 @@
       <div class="ficha-subtitulo">Comparación entre dos modalidades de cobro con igual remuneración anual bruta. Se analiza la erosión del poder de compra mediante deflactación mensual de cada pago.</div>
       <div class="ficha-meta">
         <span>Período<strong>Enero – Diciembre</strong></span>
-        <span>Salario anual<strong>$ 1.000.000</strong></span>
+        <span>Salario anual<strong id="ficha-salario">$ 1.000.000</strong></span>
         <span>Metodología<strong>Deflactación compuesta</strong></span>
       </div>
     </div>
@@ -133,6 +141,14 @@
       <div class="control-row">
         <input type="range" min="1" max="20" value="10" step="1" id="slider">
         <div class="inf-badge" id="inf-val">10%</div>
+      </div>
+      <div class="salario-row">
+        <label>Salario anual</label>
+        <div class="salario-input-wrap">
+          <span class="salario-prefix">$</span>
+          <input type="number" id="salario-input" value="1000000" min="1" step="1000">
+        </div>
+        <button class="salario-btn" onclick="applySalario()">Aplicar</button>
       </div>
     </div>
 
@@ -173,7 +189,7 @@
 
     <div class="metodologia">
       <strong>Nota metodológica</strong>
-      El presente ejercicio asume una tasa de inflación mensual constante y uniforme durante todo el período. El salario nominal de ambos trabajadores no varía. La diferencia en el poder adquisitivo real surge exclusivamente del momento en que se percibe cada pago. A mayor tasa de inflación, mayor es la penalización por diferir ingresos. El aguinaldo representa remuneración retenida por el empleador y restituida con posterioridad, lo que implica una pérdida de poder adquisitivo en contextos inflacionarios.
+      El presente ejercicio es teórico y asume una tasa de inflación mensual constante y uniforme durante todo el período. El salario nominal de ambos trabajadores no varía. La diferencia en el poder adquisitivo real surge exclusivamente del momento en que se percibe cada pago. A mayor tasa de inflación, mayor es la penalización por diferir ingresos. El aguinaldo representa remuneración retenida por el empleador y restituida con posterioridad, lo que implica una pérdida de poder adquisitivo en contextos inflacionarios.
     </div>
 
   </div>
@@ -183,18 +199,17 @@
     <div class="sidebar-box">
       <div class="sidebar-header">Parámetros del modelo</div>
       <div class="sidebar-body">
-        <div class="dato-row"><span class="dato-concepto">Salario anual bruto</span><span class="dato-valor">$1.000.000</span></div>
-        <div class="dato-row"><span class="dato-concepto">Cuota mensual — Trab. A</span><span class="dato-valor">$83.333</span></div>
-        <div class="dato-row"><span class="dato-concepto">Cuota mensual — Trab. B</span><span class="dato-valor">$76.389</span></div>
-        <div class="dato-row"><span class="dato-concepto">Aguinaldo jun. y dic. — B</span><span class="dato-valor">$41.667 c/u</span></div>
-        <div class="dato-row"><span class="dato-concepto">Total nominal ambos</span><span class="dato-valor">$1.000.000</span></div>
+        <div class="dato-row"><span class="dato-concepto">Salario anual (ambos)</span><span class="dato-valor" id="sb-salario">$1.000.000</span></div>
+        <div class="dato-row"><span class="dato-concepto">Cuota mensual — Trab. A</span><span class="dato-valor" id="sb-cuotaA">$83.333</span></div>
+        <div class="dato-row"><span class="dato-concepto">Cuota mensual — Trab. B</span><span class="dato-valor" id="sb-cuotaB">$76.389</span></div>
+        <div class="dato-row"><span class="dato-concepto">Aguinaldo jun. y dic. (solo Trab. B)</span><span class="dato-valor" id="sb-ag">$41.667 c/u</span></div>
       </div>
     </div>
 
     <div class="sidebar-box">
       <div class="sidebar-header">Valor real — meses clave</div>
       <div class="sidebar-body" id="tabla-meses"></div>
-      <div class="sidebar-nota">Valores en pesos constantes deflactados. ★ = mes con aguinaldo.</div>
+      <div class="sidebar-nota">Valores en pesos constantes deflactados. ★ = mes con aguinaldo (Trab. B).</div>
     </div>
 
     <div class="conclusion-box">
@@ -206,15 +221,19 @@
 </div>
 
 <div class="footer">
-  Simulación educativa de elaboración propia · No constituye asesoramiento financiero oficial ·
+  Simulación teórica de elaboración propia · No constituye asesoramiento financiero oficial ·
   Metodología: deflactación compuesta por (1 + tasa mensual)^n
 </div>
 
 <script>
-  const salario = 1000000;
-  const cA = salario / 12;
-  const agCada = cA / 2;
-  const cB = (salario - cA) / 12;
+  let salario = 1000000;
+
+  function calcParams() {
+    const cA = salario / 12;
+    const agCada = cA / 2;
+    const cB = (salario - cA) / 12;
+    return { cA, agCada, cB };
+  }
 
   function fmt(n, signo) {
     const abs = '$' + Math.abs(Math.round(n)).toLocaleString('es-AR');
@@ -223,6 +242,7 @@
   }
 
   function calcData(inf) {
+    const { cA, agCada, cB } = calcParams();
     const r = inf / 100;
     const labels = [], realA = [], realB = [];
     for (let m = 1; m <= 12; m++) {
@@ -233,6 +253,15 @@
       realB.push(pagoB / factor);
     }
     return { labels, realA, realB };
+  }
+
+  function updateSidebar() {
+    const { cA, agCada, cB } = calcParams();
+    document.getElementById('sb-salario').textContent = fmt(salario);
+    document.getElementById('sb-cuotaA').textContent = fmt(cA);
+    document.getElementById('sb-cuotaB').textContent = fmt(cB);
+    document.getElementById('sb-ag').textContent = fmt(agCada) + ' c/u';
+    document.getElementById('ficha-salario').textContent = '$ ' + Math.round(salario).toLocaleString('es-AR');
   }
 
   function buildTablaMeses(d) {
@@ -251,6 +280,19 @@
     });
     document.getElementById('tabla-meses').innerHTML = html;
   }
+
+  function applySalario() {
+    const val = parseFloat(document.getElementById('salario-input').value);
+    if (!isNaN(val) && val > 0) {
+      salario = val;
+      updateSidebar();
+      update();
+    }
+  }
+
+  document.getElementById('salario-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') applySalario();
+  });
 
   let myChart = null;
 
@@ -314,6 +356,7 @@
   }
 
   document.getElementById('slider').addEventListener('input', update);
+  updateSidebar();
   update();
 </script>
 </body>
