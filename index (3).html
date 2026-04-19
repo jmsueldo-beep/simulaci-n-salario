@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aguinaldo e Inflación — Simulador</title>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --azul: #003876; --azul-medio: #1a5276; --azul-claro: #d6e4f0; --azul-borde: #aac4de;
+      --celeste: #2980b9; --rojo: #c0392b; --verde: #1a6b2a;
+      --bg: #f4f4f2; --blanco: #ffffff; --gris-borde: #d0d0cc;
+      --gris-texto: #444; --gris-claro: #e8e8e5; --texto: #1a1a1a;
+      --serif: 'Source Serif 4', Georgia, serif; --sans: 'Source Sans 3', Arial, sans-serif;
+    }
+    body { background: var(--bg); color: var(--texto); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+
+    .header-top { background: var(--azul); }
+    .header-top-inner { max-width: 980px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; gap: 16px; }
+    .escudo { width: 40px; height: 40px; flex-shrink: 0; }
+    .header-org { color: rgba(255,255,255,0.85); font-size: 12px; line-height: 1.4; }
+    .header-org strong { display: block; font-size: 13px; color: #fff; font-weight: 600; }
+    .header-band { background: var(--celeste); height: 4px; }
+    .header-nav { background: var(--blanco); border-bottom: 2px solid var(--azul); }
+    .header-nav-inner { max-width: 980px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .header-nav h1 { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--azul); }
+    .header-nav .serie { font-size: 12px; color: var(--gris-texto); border-left: 1px solid var(--gris-borde); padding-left: 12px; }
+
+    .main { max-width: 980px; margin: 0 auto; padding: 28px 24px 60px; display: grid; grid-template-columns: 1fr 280px; gap: 24px; align-items: start; }
+
+    .ficha { background: var(--azul); color: #fff; padding: 20px 24px; margin-bottom: 20px; border-left: 6px solid var(--celeste); }
+    .ficha-titulo { font-family: var(--serif); font-size: 22px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
+    .ficha-subtitulo { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+    .ficha-meta { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.2); display: flex; gap: 24px; font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; flex-wrap: wrap; }
+    .ficha-meta span strong { display: block; font-size: 13px; color: #fff; text-transform: none; letter-spacing: 0; }
+
+    .control-panel { background: var(--blanco); border: 1px solid var(--gris-borde); border-top: 3px solid var(--celeste); padding: 20px; margin-bottom: 20px; }
+    .panel-titulo { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--azul); margin-bottom: 16px; border-bottom: 1px solid var(--gris-claro); padding-bottom: 10px; }
+    .controles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .control-grupo { display: flex; flex-direction: column; gap: 8px; }
+    .control-grupo label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gris-texto); }
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    input[type=range] { flex: 1; -webkit-appearance: none; height: 5px; background: var(--azul-claro); border: 1px solid var(--azul-borde); border-radius: 0; outline: none; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--azul); border: 2px solid var(--blanco); box-shadow: 0 0 0 1px var(--azul); border-radius: 0; cursor: pointer; }
+    .badge { background: var(--azul); color: #fff; font-size: 14px; font-weight: 600; font-family: var(--serif); padding: 4px 10px; min-width: 56px; text-align: center; }
+    .badge.verde { background: var(--verde); }
+
+    .modo-row { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gris-claro); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .modo-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gris-texto); }
+    .modo-btns { display: flex; border: 1px solid var(--azul-borde); overflow: hidden; }
+    .modo-btn { padding: 5px 14px; font-size: 12px; font-family: var(--sans); background: var(--blanco); border: none; cursor: pointer; color: var(--gris-texto); font-weight: 500; white-space: nowrap; }
+    .modo-btn.active { background: var(--azul); color: #fff; }
+    .modo-desc { font-size: 12px; color: #888; }
+
+    .salario-row { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gris-claro); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .salario-row label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gris-texto); white-space: nowrap; }
+    .salario-input-wrap { display: flex; align-items: center; border: 1px solid var(--azul-borde); background: var(--blanco); }
+    .salario-prefix { padding: 5px 10px; background: var(--azul-claro); color: var(--azul); font-family: var(--serif); font-weight: 600; font-size: 13px; border-right: 1px solid var(--azul-borde); }
+    input[type=number] { border: none; outline: none; padding: 5px 10px; font-family: var(--serif); font-size: 13px; font-weight: 600; color: var(--azul); width: 150px; background: var(--blanco); -moz-appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .apply-btn { background: var(--azul); color: #fff; border: none; padding: 5px 12px; font-size: 11px; font-family: var(--sans); font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; }
+    .apply-btn:hover { background: var(--azul-medio); }
+
+    .grafico-box { background: var(--blanco); border: 1px solid var(--gris-borde); padding: 20px; margin-bottom: 20px; }
+    .grafico-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+    .grafico-titulo { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--azul); border-bottom: 1px solid var(--gris-borde); padding-bottom: 8px; margin-bottom: 0; }
+    .switch-btns { display: flex; border: 1px solid var(--azul-borde); overflow: hidden; flex-shrink: 0; }
+    .switch-btn { padding: 4px 12px; font-size: 11px; font-family: var(--sans); background: var(--blanco); border: none; cursor: pointer; color: var(--gris-texto); font-weight: 500; white-space: nowrap; }
+    .switch-btn.active { background: var(--azul); color: #fff; }
+    .leyenda { display: flex; gap: 20px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+    .ley-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--gris-texto); }
+    .ley-rect { width: 20px; height: 3px; flex-shrink: 0; }
+    .ley-diamond { width: 10px; height: 10px; background: var(--rojo); transform: rotate(45deg); flex-shrink: 0; }
+    .canvas-wrap { position: relative; width: 100%; height: 260px; }
+    .grafico-nota { font-size: 11px; color: #888; margin-top: 12px; border-top: 1px solid var(--gris-claro); padding-top: 8px; line-height: 1.5; }
+
+    .resultados { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--gris-borde); border: 1px solid var(--gris-borde); margin-bottom: 20px; }
+    .res-card { background: var(--blanco); padding: 14px 16px; }
+    .res-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gris-texto); margin-bottom: 6px; line-height: 1.4; }
+    .res-value { font-family: var(--serif); font-size: 20px; font-weight: 700; }
+
+    .metodologia { background: var(--azul-claro); border: 1px solid var(--azul-borde); border-left: 4px solid var(--azul); padding: 16px 18px; font-size: 13px; color: var(--azul-medio); line-height: 1.6; }
+    .metodologia strong { font-weight: 600; color: var(--azul); display: block; margin-bottom: 4px; }
+
+    .sidebar-box { background: var(--blanco); border: 1px solid var(--gris-borde); margin-bottom: 16px; }
+    .sidebar-header { background: var(--azul-medio); color: #fff; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; padding: 9px 14px; }
+    .sidebar-body { padding: 14px; }
+    .dato-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--gris-claro); font-size: 13px; gap: 8px; }
+    .dato-row:last-child { border-bottom: none; }
+    .dato-concepto { color: var(--gris-texto); line-height: 1.3; font-size: 12px; }
+    .dato-valor { font-family: var(--serif); font-weight: 700; color: var(--azul); white-space: nowrap; font-size: 13px; }
+    .sidebar-nota { padding: 10px 14px; font-size: 11px; color: #888; border-top: 1px solid var(--gris-claro); line-height: 1.5; }
+    .conclusion-box { background: var(--azul); color: #fff; padding: 18px; font-size: 13px; line-height: 1.7; }
+    .conclusion-box strong { display: block; font-family: var(--serif); font-size: 15px; margin-bottom: 8px; color: rgba(255,255,255,0.9); }
+
+    .footer { background: var(--azul); color: rgba(255,255,255,0.45); text-align: center; font-size: 11px; padding: 16px 24px; line-height: 1.6; }
+
+    @media (max-width: 700px) {
+      .main { grid-template-columns: 1fr; }
+      .controles-grid { grid-template-columns: 1fr; }
+      .resultados { grid-template-columns: 1fr 1fr; }
+      .header-nav h1 { font-size: 16px; }
+      .ficha-titulo { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header-top">
+  <div class="header-top-inner">
+    <svg class="escudo" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="19" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+      <ellipse cx="20" cy="20" rx="8" ry="12" fill="none" stroke="#75aadb" stroke-width="2"/>
+      <line x1="20" y1="8" x2="20" y2="32" stroke="#75aadb" stroke-width="1.5"/>
+      <line x1="12" y1="20" x2="28" y2="20" stroke="#75aadb" stroke-width="1.5"/>
+      <circle cx="20" cy="20" r="3" fill="#aac4de"/>
+    </svg>
+    <div class="header-org">
+      <strong>Ministerio de Economía Ficticio · Análisis Financiero</strong>
+      Ejercicio teórico de divulgación · Poder adquisitivo y salarios
+    </div>
+  </div>
+</div>
+<div class="header-band"></div>
+<div class="header-nav">
+  <div class="header-nav-inner">
+    <h1>Simulador de Depreciación Salarial</h1>
+    <span class="serie">Ejercicio teórico · Elaboración propia</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="content">
+
+    <div class="ficha">
+      <div class="ficha-titulo">Impacto del Aguinaldo y la Actualización<br>Salarial en el Poder Adquisitivo Real</div>
+      <div class="ficha-subtitulo">Comparación entre dos modalidades de cobro con igual remuneración anual bruta, bajo distintos escenarios de inflación y actualización salarial.</div>
+      <div class="ficha-meta">
+        <span>Período<strong>Enero – Diciembre</strong></span>
+        <span>Salario inicial<strong id="ficha-salario">$ 13.000.000</strong></span>
+        <span>Metodología<strong>Deflactación compuesta</strong></span>
+      </div>
+    </div>
+
+    <div class="control-panel">
+      <div class="panel-titulo">Parámetros de simulación</div>
+      <div class="controles-grid">
+        <div class="control-grupo">
+          <label>Inflación mensual</label>
+          <div class="slider-row">
+            <input type="range" min="0.5" max="20" value="10" step="0.5" id="sl-inf">
+            <div class="badge" id="val-inf">10%</div>
+          </div>
+        </div>
+        <div class="control-grupo">
+          <label>Actualización salarial</label>
+          <div class="slider-row">
+            <input type="range" min="0" max="20" value="2" step="0.5" id="sl-act">
+            <div class="badge verde" id="val-act">2%</div>
+          </div>
+        </div>
+      </div>
+      <div class="modo-row">
+        <span class="modo-label">Frecuencia de actualización</span>
+        <div class="modo-btns">
+          <button class="modo-btn active" id="btn-mensual" onclick="setModo('mensual')">Mensual</button>
+          <button class="modo-btn" id="btn-trimestral" onclick="setModo('trimestral')">Trimestral</button>
+          <button class="modo-btn" id="btn-semestral" onclick="setModo('semestral')">Semestral</button>
+        </div>
+        <span class="modo-desc" id="modo-desc"></span>
+      </div>
+      <div class="salario-row">
+        <label>Salario anual inicial</label>
+        <div class="salario-input-wrap">
+          <span class="salario-prefix">$</span>
+          <input type="number" id="salario-input" value="13000000" min="1" step="100000">
+        </div>
+        <button class="apply-btn" onclick="applySalario()">Aplicar</button>
+      </div>
+    </div>
+
+    <!-- GRÁFICO -->
+    <div class="grafico-box">
+      <div class="grafico-top">
+        <div style="flex:1;">
+          <div class="grafico-titulo" id="gtit-txt">Valor real de cada pago mensual (en pesos constantes del mes 1)</div>
+        </div>
+        <div class="switch-btns">
+          <button class="switch-btn active" id="btn-pesos" onclick="setVista('pesos')">$ Pesos</button>
+          <button class="switch-btn" id="btn-var" onclick="setVista('var')">% Variación</button>
+        </div>
+      </div>
+      <div class="leyenda">
+        <div class="ley-item"><div class="ley-rect" style="background:#003876;"></div>Trabajador A — sin aguinaldo</div>
+        <div class="ley-item"><div class="ley-rect" style="background:#c0392b;"></div>Trabajador B — con aguinaldo</div>
+        <div class="ley-item"><div class="ley-diamond"></div>Meses de aguinaldo (B)</div>
+      </div>
+      <div class="canvas-wrap"><canvas id="chart1" role="img" aria-label="Valor real o variación de cada pago mensual"></canvas></div>
+      <div class="grafico-nota" id="nota-grafico">Valor real = pago nominal deflactado por (1 + inflación)^mes. Los rombos ◆ indican los meses donde el Trabajador B recibe aguinaldo además de su cuota mensual.</div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="resultados">
+      <div class="res-card">
+        <div class="res-label">Total real — Trab. A</div>
+        <div class="res-value" id="res-a" style="color:#003876;"></div>
+      </div>
+      <div class="res-card">
+        <div class="res-label">Total real — Trab. B</div>
+        <div class="res-value" id="res-b" style="color:#c0392b;"></div>
+      </div>
+      <div class="res-card">
+        <div class="res-label">Diferencia (A − B)</div>
+        <div class="res-value" id="res-diff"></div>
+      </div>
+      <div class="res-card">
+        <div class="res-label">Pérdida/Ganancia real acumulada — A</div>
+        <div class="res-value" id="res-perdA"></div>
+      </div>
+      <div class="res-card">
+        <div class="res-label">Pérdida/Ganancia real acumulada — B</div>
+        <div class="res-value" id="res-perdB"></div>
+      </div>
+      <div class="res-card">
+        <div class="res-label">Inflación acumulada anual</div>
+        <div class="res-value" id="res-infacum"></div>
+      </div>
+    </div>
+
+    <div class="metodologia">
+      <strong>Nota metodológica</strong>
+      Ejercicio teórico con inflación mensual constante. La actualización salarial se aplica según la frecuencia elegida: mensual (cada mes), trimestral (meses 3, 6, 9, 12) o semestral (meses 6 y 12). En vista "$ Pesos": valor real = pago nominal / (1 + tasa)^mes. En vista "% Variación": variación de cada pago real respecto al pago nominal base del mes 1 de cada trabajador. El aguinaldo del Trabajador B equivale a medio sueldo mensual del Trabajador A sobre el salario inicial, pagado en junio y diciembre.
+    </div>
+
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-box">
+      <div class="sidebar-header">Parámetros del modelo</div>
+      <div class="sidebar-body">
+        <div class="dato-row"><span class="dato-concepto">Salario anual inicial (ambos)</span><span class="dato-valor" id="sb-salario"></span></div>
+        <div class="dato-row"><span class="dato-concepto">Cuota mensual inicial — A</span><span class="dato-valor" id="sb-cuotaA"></span></div>
+        <div class="dato-row"><span class="dato-concepto">Cuota mensual inicial — B</span><span class="dato-valor" id="sb-cuotaB"></span></div>
+        <div class="dato-row"><span class="dato-concepto">Aguinaldo jun. y dic. (solo Trab. B)</span><span class="dato-valor" id="sb-ag"></span></div>
+        <div class="dato-row"><span class="dato-concepto">Inflación acumulada anual</span><span class="dato-valor" id="sb-infacum">—</span></div>
+        <div class="dato-row"><span class="dato-concepto">Actualización acumulada anual</span><span class="dato-valor" id="sb-actacum">—</span></div>
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-header">Valor real — meses clave</div>
+      <div class="sidebar-body" id="tabla-meses"></div>
+      <div class="sidebar-nota">Azul = Trab. A / Rojo = Trab. B. ◆ = mes con aguinaldo.</div>
+    </div>
+    <div class="conclusion-box">
+      <strong>Conclusión</strong>
+      Cuando la actualización salarial es menor a la inflación, ambos trabajadores pierden poder adquisitivo. El Trabajador B pierde más: resigna ingresos mensuales para recibir el aguinaldo tarde, cuando ya vale menos en términos reales. El aguinaldo frena la caída puntualmente pero no compensa lo diferido.
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Simulación teórica de elaboración propia · No constituye asesoramiento financiero oficial ·
+  Metodología: deflactación compuesta por (1 + tasa mensual)^n
+</div>
+
+<script>
+  let salario = 13000000;
+  let modo = 'mensual';
+  let vista = 'pesos';
+
+  const agIdx = [5, 11];
+  const labels = ['Mes 1','Mes 2','Mes 3','Mes 4','Mes 5','Mes 6','Mes 7','Mes 8','Mes 9','Mes 10','Mes 11','Mes 12'];
+
+  function setModo(m) {
+    modo = m;
+    ['mensual','trimestral','semestral'].forEach(b =>
+      document.getElementById('btn-' + b).classList.toggle('active', b === m));
+    updateModoDesc();
+    update();
+  }
+
+  function setVista(v) {
+    vista = v;
+    document.getElementById('btn-pesos').classList.toggle('active', v === 'pesos');
+    document.getElementById('btn-var').classList.toggle('active', v === 'var');
+    update();
+  }
+
+  function updateModoDesc() {
+    const act = parseFloat(document.getElementById('sl-act').value);
+    const descs = {
+      mensual: `+${act}% cada mes sobre el nominal anterior`,
+      trimestral: `+${((Math.pow(1 + act/100, 3) - 1)*100).toFixed(2)}% cada trimestre (meses 3, 6, 9, 12)`,
+      semestral: `+${((Math.pow(1 + act/100, 6) - 1)*100).toFixed(2)}% cada semestre (meses 6 y 12)`
+    };
+    document.getElementById('modo-desc').textContent = descs[modo];
+  }
+
+  function fmt(n, signo) {
+    const abs = '$' + Math.abs(Math.round(n)).toLocaleString('es-AR');
+    if (signo) return (n >= 0 ? '+' : '−') + abs;
+    return abs;
+  }
+
+  function fmtPct(n) {
+    return (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
+  }
+
+  function factorAct(m, a) {
+    if (modo === 'mensual') return Math.pow(1 + a, m - 1);
+    if (modo === 'trimestral') return Math.pow(1 + a, 3 * Math.floor((m - 1) / 3));
+    return Math.pow(1 + a, 6 * Math.floor((m - 1) / 6));
+  }
+
+  function calcData(inf, act) {
+    const r = inf / 100;
+    const a = act / 100;
+    const cA0 = salario / 12;
+    const agCada = cA0 / 2;
+    const cB0 = (salario - cA0) / 12;
+
+    const realA = [], realB = [], varA = [], varB = [];
+    let sumRealA = 0, sumRealB = 0, baseAcumA = 0, baseAcumB = 0;
+
+    for (let m = 1; m <= 12; m++) {
+      const f = Math.pow(1 + r, m);
+      const fa = factorAct(m, a);
+      const esAg = (m === 6 || m === 12);
+
+      const cAnom = cA0 * fa;
+      const pagoNomB = (cB0 * fa) + (esAg ? agCada * fa : 0);
+
+      const vA = cAnom / f;
+      const vB = pagoNomB / f;
+
+      realA.push(vA);
+      realB.push(vB);
+
+      // variación de cada pago vs pago base mes 1 (para el gráfico)
+      varA.push((vA - cA0) / cA0 * 100);
+      varB.push((vB - cB0) / cB0 * 100);
+
+      // acumulados para los cuadritos (fórmula Excel)
+      sumRealA += vA;   baseAcumA += cA0;
+      sumRealB += vB;   baseAcumB += esAg ? (cB0 + agCada) : cB0;
+    }
+
+    const perdAcumA = (sumRealA - baseAcumA) / baseAcumA * 100;
+    const perdAcumB = (sumRealB - baseAcumB) / baseAcumB * 100;
+
+    return { realA, realB, varA, varB, cA0, agCada, cB0, perdAcumA, perdAcumB };
+  }
+
+  function updateSidebar(inf, act, d) {
+    document.getElementById('sb-salario').textContent = fmt(salario);
+    document.getElementById('sb-cuotaA').textContent = fmt(d.cA0);
+    document.getElementById('sb-cuotaB').textContent = fmt(d.cB0);
+    document.getElementById('sb-ag').textContent = fmt(d.agCada) + ' c/u';
+    document.getElementById('sb-infacum').textContent = ((Math.pow(1 + inf/100, 12) - 1)*100).toFixed(1) + '%';
+    document.getElementById('sb-actacum').textContent = ((Math.pow(1 + act/100, 12) - 1)*100).toFixed(1) + '%';
+    document.getElementById('ficha-salario').textContent = '$ ' + Math.round(salario).toLocaleString('es-AR');
+  }
+
+  function buildTablaMeses(d) {
+    const meses = [1, 3, 6, 9, 12];
+    const nombres = ['Mes 1', 'Mes 3', 'Mes 6 ◆', 'Mes 9', 'Mes 12 ◆'];
+    let html = '';
+    meses.forEach((m, i) => {
+      const idx = m - 1;
+      html += `<div class="dato-row">
+        <span class="dato-concepto">${nombres[i]}</span>
+        <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:12px;">
+          <span style="color:#003876;">${fmt(d.realA[idx])}</span>
+          <span style="color:#c0392b;">${fmt(d.realB[idx])}</span>
+        </span>
+      </div>`;
+    });
+    document.getElementById('tabla-meses').innerHTML = html;
+  }
+
+  // plugins
+  const diamondPlugin = {
+    id: 'diamondPlugin',
+    afterDraw(chart) {
+      const ctx = chart.ctx;
+      const meta = chart.getDatasetMeta(1);
+      agIdx.forEach(i => {
+        const p = meta.data[i]; if (!p) return;
+        const s = 7;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y-s); ctx.lineTo(p.x+s, p.y);
+        ctx.lineTo(p.x, p.y+s); ctx.lineTo(p.x-s, p.y);
+        ctx.closePath();
+        ctx.fillStyle = '#c0392b'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+        ctx.fill(); ctx.stroke(); ctx.restore();
+      });
+    }
+  };
+
+  Chart.register(diamondPlugin);
+
+  let myChart = null;
+
+  function update() {
+    const inf = parseFloat(document.getElementById('sl-inf').value);
+    const act = parseFloat(document.getElementById('sl-act').value);
+
+    document.getElementById('val-inf').textContent = inf + '%';
+    document.getElementById('val-act').textContent = act + '%';
+    updateModoDesc();
+
+    const d = calcData(inf, act);
+    updateSidebar(inf, act, d);
+    buildTablaMeses(d);
+
+    const infAnual = ((Math.pow(1 + inf/100, 12) - 1)*100).toFixed(1) + '%';
+    const totalA = d.realA.reduce((a, b) => a + b, 0);
+    const totalB = d.realB.reduce((a, b) => a + b, 0);
+    const diff = totalA - totalB;
+    const perdA = d.perdAcumA;
+    const perdB = d.perdAcumB;
+
+    document.getElementById('res-a').textContent = fmt(totalA);
+    document.getElementById('res-b').textContent = fmt(totalB);
+    document.getElementById('res-diff').textContent = fmt(diff, true);
+    document.getElementById('res-diff').style.color = diff >= 0 ? '#1a6b2a' : '#c0392b';
+    document.getElementById('res-perdA').textContent = fmtPct(perdA);
+    document.getElementById('res-perdA').style.color = perdA >= 0 ? '#1a6b2a' : '#c0392b';
+    document.getElementById('res-perdB').textContent = fmtPct(perdB);
+    document.getElementById('res-perdB').style.color = perdB >= 0 ? '#1a6b2a' : '#c0392b';
+    document.getElementById('res-infacum').textContent = infAnual;
+    document.getElementById('sb-infacum').textContent = infAnual;
+
+    const esPesos = vista === 'pesos';
+    const dataA = esPesos ? d.realA : d.varA;
+    const dataB = esPesos ? d.realB : d.varB;
+    const pR = labels.map((_, i) => agIdx.includes(i) ? 0 : 3);
+
+    document.getElementById('gtit-txt').textContent = esPesos
+      ? 'Valor real de cada pago mensual (en pesos constantes del mes 1)'
+      : 'Variación de cada pago mensual vs pago base del mes 1 (%)';
+
+    document.getElementById('nota-grafico').textContent = esPesos
+      ? 'Valor real = pago nominal deflactado por (1 + inflación)^mes. Los rombos ◆ indican los meses donde el Trabajador B recibe aguinaldo además de su cuota mensual.'
+      : 'Variación = (pago real − pago nominal base mes 1) / pago nominal base mes 1 × 100. Negativo = pérdida de poder adquisitivo. En los meses ◆, B frena su caída por el aguinaldo.';
+
+    const yCallback = esPesos
+      ? v => Math.abs(v) >= 1000000 ? '$' + (v/1000000).toFixed(1) + 'M' : '$' + Math.round(v/1000) + 'k'
+      : v => v.toFixed(0) + '%';
+
+    const tooltipLabel = esPesos
+      ? ctx => ' ' + ctx.dataset.label + ': $' + Math.round(ctx.parsed.y).toLocaleString('es-AR')
+      : ctx => ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(2) + '%';
+
+    if (myChart) {
+      myChart.data.datasets[0].data = dataA;
+      myChart.data.datasets[1].data = dataB;
+      myChart.data.datasets[1].pointRadius = pR;
+      myChart.options.scales.y.ticks.callback = yCallback;
+      myChart.options.plugins.tooltip.callbacks.label = tooltipLabel;
+      myChart.update();
+    } else {
+      myChart = new Chart(document.getElementById('chart1'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Trabajador A', data: dataA, borderColor: '#003876', backgroundColor: 'rgba(0,56,118,0.05)', borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: '#003876', fill: true, tension: 0.1 },
+            { label: 'Trabajador B', data: dataB, borderColor: '#c0392b', backgroundColor: 'rgba(192,57,43,0.05)', borderWidth: 2, borderDash: [5,3], pointRadius: pR, pointBackgroundColor: '#c0392b', fill: true, tension: 0.1 }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#fff', borderColor: '#d0d0cc', borderWidth: 1, titleColor: '#444', bodyColor: '#1a1a1a',
+              callbacks: {
+                label: tooltipLabel,
+                afterLabel: ctx => (agIdx.includes(ctx.dataIndex) && ctx.datasetIndex === 1) ? ' ◆ incluye aguinaldo' : ''
+              }
+            }
+          },
+          scales: {
+            x: { ticks: { color: '#666', font: { size: 11 }, autoSkip: false, maxRotation: 0 }, grid: { color: 'rgba(0,0,0,0.05)' }, border: { color: '#d0d0cc' } },
+            y: { ticks: { color: '#666', font: { size: 11 }, callback: yCallback }, grid: { color: 'rgba(0,0,0,0.05)' }, border: { color: '#d0d0cc' } }
+          }
+        }
+      });
+    }
+  }
+
+  function applySalario() {
+    const val = parseFloat(document.getElementById('salario-input').value);
+    if (!isNaN(val) && val > 0) { salario = val; update(); }
+  }
+
+  document.getElementById('salario-input').addEventListener('keydown', e => { if (e.key === 'Enter') applySalario(); });
+  document.getElementById('sl-inf').addEventListener('input', update);
+  document.getElementById('sl-act').addEventListener('input', update);
+
+  update();
+</script>
+</body>
+</html>
